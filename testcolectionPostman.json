@@ -1,0 +1,630 @@
+{
+  "info": {
+    "_postman_id": "b3f8f1c2-1234-4567-8901-abcdef123456",
+    "name": "BikeSchmiede Booking System",
+    "description": "Collection für das neue Buchungssystem der Fahrradwerkstatt",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Auth (Setup)",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"kunde@test.com\",\n    \"password\": \"password123\",\n    \"firstName\": \"Max\",\n    \"lastName\": \"Musterkunde\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login User (Save Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.token) {",
+                  "    pm.collectionVariables.set(\"userToken\", jsonData.data.token);",
+                  "    console.log(\"User Token saved\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"kunde@test.com\",\n    \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Admin (Save Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.token) {",
+                  "    pm.collectionVariables.set(\"adminToken\", jsonData.data.token);",
+                  "    console.log(\"Admin Token saved\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"michael@example.com\",\n    \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Note: You need to manually create an admin user in DB or change role of a user to 'admin'"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Services (Katalog)",
+      "item": [
+        {
+          "name": "Get All Services (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/services",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "services"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Service (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data._id) {",
+                  "    pm.collectionVariables.set(\"serviceId\", jsonData.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Kleine Inspektion\",\n    \"description\": \"Bremsen, Schaltung, Schrauben prüfen\",\n    \"price\": 49.00,\n    \"durationCustomerMinutes\": 0,\n    \"durationTotalMinutes\": 60,\n    \"category\": \"Werkstatt\",\n    \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/services",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "services"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Service (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"price\": 59.00\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/services/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "services", "{{serviceId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Service (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/services/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "services", "{{serviceId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Schedules (Öffnungszeiten)",
+      "item": [
+        {
+          "name": "Create Schedule (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data._id) {",
+                  "    pm.collectionVariables.set(\"scheduleId\", jsonData.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Standard Sommer\",\n    \"validFrom\": \"2023-01-01T00:00:00.000Z\",\n    \"slotDurationMinutes\": 60,\n    \"isActive\": true,\n    \"openingHours\": {\n        \"monday\": [\n            {\"start\": \"09:00\", \"end\": \"12:00\"},\n            {\"start\": \"13:00\", \"end\": \"18:00\"}\n        ],\n        \"tuesday\": [\n            {\"start\": \"09:00\", \"end\": \"12:00\"},\n            {\"start\": \"13:00\", \"end\": \"18:00\"}\n        ],\n        \"wednesday\": [\n            {\"start\": \"09:00\", \"end\": \"12:00\"}\n        ],\n        \"thursday\": [\n            {\"start\": \"09:00\", \"end\": \"12:00\"},\n            {\"start\": \"13:00\", \"end\": \"18:00\"}\n        ],\n        \"friday\": [\n            {\"start\": \"09:00\", \"end\": \"16:00\"}\n        ],\n        \"saturday\": [],\n        \"sunday\": []\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/schedules",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "schedules"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Activate Schedule (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/schedules/{{scheduleId}}/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "schedules", "{{scheduleId}}", "activate"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Schedules (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/schedules",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "schedules"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Bookings",
+      "item": [
+        {
+          "name": "Public",
+          "item": [
+            {
+              "name": "Get Availability (Public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bookings/availability?from=2025-05-01&to=2025-05-07",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "bookings", "availability"],
+                  "query": [
+                    {
+                      "key": "from",
+                      "value": "2025-05-01"
+                    },
+                    {
+                      "key": "to",
+                      "value": "2025-05-07"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Booking (User)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "if (jsonData.data && jsonData.data._id) {",
+                      "    pm.collectionVariables.set(\"bookingId\", jsonData.data._id);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{userToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"start\": \"2025-05-05T09:00:00.000Z\",\n    \"end\": \"2025-05-05T10:00:00.000Z\",\n    \"services\": [\n        {\n            \"name\": \"Kleine Inspektion\",\n            \"price\": 49.00,\n            \"durationMinutes\": 60\n        }\n    ],\n    \"customerNotes\": \"Bitte Schaltung prüfen\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/bookings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "bookings"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "User",
+          "item": [
+            {
+              "name": "Get My Bookings",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{userToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bookings/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "bookings", "me"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Cancel My Booking",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{userToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bookings/{{bookingId}}/cancel",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "bookings", "{{bookingId}}", "cancel"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin",
+          "item": [
+            {
+              "name": "Get All Bookings",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{adminToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bookings/admin?from=2025-05-01&to=2025-05-30",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "bookings", "admin"],
+                  "query": [
+                    {
+                      "key": "from",
+                      "value": "2025-05-01"
+                    },
+                    {
+                      "key": "to",
+                      "value": "2025-05-30"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Blocker",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{adminToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"start\": \"2025-05-06T09:00:00.000Z\",\n    \"end\": \"2025-05-06T18:00:00.000Z\",\n    \"adminNotes\": \"Urlaub\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/bookings/admin/block",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "bookings", "admin", "block"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Status",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{adminToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"status\": \"completed\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/bookings/admin/{{bookingId}}/status",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "bookings",
+                    "admin",
+                    "{{bookingId}}",
+                    "status"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Admin Notes",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{adminToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"adminNotes\": \"Kunde informiert, Rad abholbereit.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/bookings/admin/{{bookingId}}/notes",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "bookings", "admin", "{{bookingId}}", "notes"]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4200",
+      "type": "string"
+    },
+    {
+      "key": "userToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "serviceId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "scheduleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "bookingId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

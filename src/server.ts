@@ -14,6 +14,9 @@ import productRoutes from './routes/product.routes';
 import blogRoutes from './routes/blog.routes';
 import connectDB from './config/db';
 import authRoutes from './routes/auth.routes';
+import serviceRoutes from './routes/service.routes';
+import scheduleRoutes from './routes/schedule.routes';
+import bookingRoutes from './routes/booking.routes';
 
 connectDB();
 
@@ -65,6 +68,9 @@ app.use('/api/order', orderRoutes);
 app.use('/api/sessions', sessionRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/blog', blogRoutes);
+app.use('/api/services', serviceRoutes);
+app.use('/api/schedules', scheduleRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 initializeSocketIO(server);
 
